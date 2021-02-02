@@ -89,7 +89,6 @@ Can be installed from the current directory. <br>
 
 ##
 ## Learning Gatekeeper with katacoda.
-You can learn to use OPA Gatekeeper and write custom REGO policies with the following Katacoda scenarios.
-[Katacoda scenarios](https://www.katacoda.com/vishalpranav/courses/opagatekeeper-policy)
+You can learn to use OPA Gatekeeper and write custom REGO policies with the following [Katacoda scenarios.](https://www.katacoda.com/vishalpranav/courses/opagatekeeper-policy)
 
 
