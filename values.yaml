@@ -1,11 +1,1 @@
-#####################  Network-Policy #######################
-
-# Deny Egress rules for a specific namespace
-denyEgress:
-        namespace: "backend"
-
-
-# Allow ingress from pods with allowed labels
-denyIngressLabel:
-        label: "mysql"
-      
+# Create custom templtaes to change the values directly from this file instead of changing it from the template or CRD's
