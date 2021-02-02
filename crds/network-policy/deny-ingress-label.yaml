@@ -1,0 +1,30 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdenyingress
+  annotations:
+          description: Deny ingress acess from a pod not matching the provided label.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDenyIngress
+      validation:
+              openAPIV3Schema:
+                      properties:
+                              label:
+                                      type: array
+                                      items:
+                                              type: string  
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdenyingress 
+        violation [{"msg": msg}] {
+          input.review.object.spec.podSelector.matchLabels.app == "mysql"
+          provided := input.review.object.spec.ingress[_].from[_].podSelector.matchLabels.app
+          required := input.parameters.label[_]
+          not contains(required,provided)
+          msg := "Cannot allow ingress access from the selected pod."
+        }
+

@@ -1,0 +1,20 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdenylabel
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDenyLabel
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdenylabel 
+        violation [{"msg": msg}] {
+          input.review.object.metadata.namespace == "backend"
+          input.review.object.spec.podSelector.matchLabels.access == "admin"
+          msg := "You are not allowed to apply any network policies to the pod."
+
+        }
+

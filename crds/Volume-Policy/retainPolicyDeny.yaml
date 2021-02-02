@@ -1,0 +1,20 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sblockretain
+  annotations:
+    description: Disallows Retain Policy
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sBlockRetain
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sblockretain
+        violation[{"msg": msg}] {
+         input.review.object.kind == "StorageClass"
+         input.review.object.reclaimPolicy == "Retain"
+         msg := "Retain Policy should not be used"
+        }

@@ -1,0 +1,19 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdenyegress
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDenyEgress
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdenyegress 
+        violation [{"msg": msg}] {
+          input.review.object.spec.podSelector.matchLabels.app == "webserver"
+          input.review.object.spec.egress[_].to[_].podSelector.matchLabels.app != "mysql"
+          msg := "Cannot allow egress access."
+        }
+

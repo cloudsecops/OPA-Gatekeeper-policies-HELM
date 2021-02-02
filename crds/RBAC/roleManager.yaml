@@ -1,0 +1,28 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sroleauth
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRoleAuth
+      validation:
+              openAPIV3Schema:
+                      properties:
+                              users:
+                                      type: array
+                                      items:
+                                              type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+       package k8sroleauth
+       violation[{ "msg": msg}]{
+         input.review.object.kind == "RoleBinding"
+         input.review.object.roleRef.name == "role-manager"
+         name := input.review.object.subjects[_].name
+         allowed_names := input.parameters.users[_]
+         not contains(allowed_names,name)
+         msg := "not allowed" }
+

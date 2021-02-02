@@ -1,0 +1,19 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sprivilegedcontainer
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sPrivilegedContainer
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sprivilegedcontainer
+        violation [{"msg": msg}] {
+          input.review.object.spec.containers.SecurityContext.privileged == true
+          msg := "Privileged containers are not allowed."
+
+        }
+

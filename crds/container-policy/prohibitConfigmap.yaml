@@ -1,0 +1,35 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdenyconfigmap
+  annotations:
+    description: Controls usage of host networking and ports.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDenyConfigMap
+      validation:
+        # Schema for the `parameters` field
+        openAPIV3Schema:
+          properties:
+            paths:
+              type: array
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdenyconfigmap
+
+        violation[{"msg": msg, "details": {}}] {
+         input.review.object.kind == "Pod"
+         allowedconfigmaps := input.parameters.configmaps
+         configmap := input.review.object.spec.volumes[_].configMap.name
+         not contains(allowedconfigmaps,configmap)
+         msg := sprintf("%v - configmap not allowed",[configmap])
+        }
+
+        contains(allowedconfigmaps,configmap) {
+         configmap == allowedconfigmaps[_]
+        }

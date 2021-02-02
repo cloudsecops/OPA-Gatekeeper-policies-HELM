@@ -1,0 +1,11 @@
+#####################  Network-Policy #######################
+
+# Deny Egress rules for a specific namespace
+denyEgress:
+        namespace: "backend"
+
+
+# Allow ingress from pods with allowed labels
+denyIngressLabel:
+        label: "mysql"
+      

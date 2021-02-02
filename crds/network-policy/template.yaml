@@ -1,0 +1,28 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdenyegresscidr
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDenyEgressCidr
+      validation:
+              openAPIV3Schema:
+                      properties:
+                              cidr:
+                                      type: array
+                                      items:
+                                              type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdenyegresscidr
+        violation [{"msg": msg}] {
+            input.review.object.kind == "NetworkPolicy"
+            cidr_or_ip :=   input.review.object.spec.egress[_].to[_].ipBlock.cidr
+            cidr :=  input.parameters.cidr[_]
+            value := net.cidr_contains(cidr, cidr_or_ip)
+            not(value)
+            msg := "The specified IP is not allowed." }
+

@@ -1,0 +1,22 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8sblocklatesttag
+  annotations:
+    description: Disallows all Services with type NodePort.
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sBlockLatestTag
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sblocklatesttag
+
+        violation[{"msg": msg, "details": {}}]{
+         input.review.object.kind == "Pod"
+         imagename := input.review.object.spec.containers[_].image
+         endswith(imagename,"latest")
+         msg := "Images with tag the tag \"latest\" is prohibited"
+        }
